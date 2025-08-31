@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "axe/forms": "off",
+    "no-inline-styles": "off",
+    "axe/structure": "off",
+    "compat-api/html": "off",
+    "manifest-file-extension": "off",
+    "apple-touch-icons": "off"
+  }
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Stocks</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+  <!-- Dashboard-only favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+  
+  <style>
+    /* Base Styles */
+    body {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form-container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      margin-bottom: 25px;
+      color: #0a0a23;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    /* Two-column layout */
+    .form-grid {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input, select{
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    /* Flash Alert */
+    .alert {
+      margin: 20px auto;
+      padding: 15px 20px;
+      border-radius: 6px;
+      width: 90%;
+      max-width: 600px;
+      font-weight: 500;
+      text-align: center;
+      animation: fadeOut 3s forwards;
+    }
+
+    .alert.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: translateY(0); }
+      60% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); display: none; }
+    }
+
+    /* Button Styles */
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1 1 45%;
+      padding: 12px 20px;
+      background: linear-gradient(to right, #5b49d6, #7a5ee0);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(to right, #4831b4, #5b49d6);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary {
+      flex: 1 1 45%;
+      padding: 12px 20px;
+      background: #ddd;
+      color: #333;
+      border-radius: 25px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #bbb;
+      color: #000;
+    }
+
+    /* Responsive Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    /* Checkbox Styles */
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #6a0dad;
+    }
+
+    .checkbox label {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+      .form-grid {
+        flex-direction: column;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn, .btn-secondary {
+        flex: 1 1 100%;
+      }
+
+      body {
+        padding: 15px;
+      }
+
+      .form-container {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h1>Add New Stock</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Add Stock Form -->
+    <form method="POST" action="{{ url_for('add_product') }}" id="addProductForm">
+      <div class="form-grid">
+
+        <!-- Left Column -->
+        <div class="form-group">
+          <label for="product_name">Product Name :</label>
+          <input type="text" id="product_name" name="product_name" required>
+          
+          <label for="product_category">Product Category :</label>
+          <select name="product_category" id="product_category" required>
+            <option value="" disabled selected>-- Select Product Category --</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Fashion</option>
+            <option value="Home & Kitchen">Home & Kitchen</option>
+            <option value="Books">Accessories</option>
+            <option value="Health & Beauty">Personal Care</option>
+            <option value="Other">Other</option>
+          </select>
+      
+          <label for="sku">SKU (Stock Keeping Unit) :</label>
+          <input type="text" id="sku" name="sku" required>
+
+          <label for="supplier_id">Supplier ID :</label>
+          <input type="text" id="supplier_id" name="supplier_id" required>
+
+          <label for="measurement_unit">Measurement Unit :</label>
+          <input type="text" id="measurement_unit" name="measurement_unit" required>
+        </div>
+
+        <!-- Right Column -->
+        <div class="form-group">
+          <label for="quantity_in_stock">Quantity in Stock :</label>
+          <input type="number" id="quantity_in_stock" name="quantity_in_stock" required>
+
+          <label for="reorder_level">Reorder Level :</label>
+          <input type="number" id="reorder_level" name="reorder_level" required>
+
+          <label for="purchase_price">Purchase Price :</label>
+          <input type="number" id="purchase_price" name="purchase_price" min="1" required>
+
+          <label for="selling_price">Selling Price :</label>
+          <input type="number" id="selling_price" name="selling_price" min="1" required>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Add New Stock</button>
+      </div>
+    </form>
+  </div>
+
+<script>
+  const form = document.querySelector('#addProductForm');  // Correct way to select by id
+  form.reset();    // Reset form fields on page load (optional)
+  
+  form.addEventListener('submit', function(event) {
+        event.preventDefault();   // Prevent form from submitting
+        // You can add your form submission logic here (e.g., AJAX request)
+
+        form.reset();  // Reset the form after submission
+  });
+
+  window.onbeforeunload = function () {
+    // Trigger logout by sending an AJAX request to the backend
+    fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ logout: true })  // Send a logout request
+    });
+  };
+</script>
+
+</body>
+</html>

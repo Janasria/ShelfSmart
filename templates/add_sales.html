@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Sales</title>
+
+<!-- Dashboard-only favicon -->
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+
+<style>
+  body {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    background-color: rgb(230, 230, 250);
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: 20px auto;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    text-align: center;
+    color: #6b5b95;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  input, select, button {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    margin-top: 15px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  th {
+    background-color: #6b5b95;
+    color: white;
+  }
+
+  .btn {
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .btn-primary { background-color: #6b5b95; }
+  .btn-primary:hover { background-color: #5a4a82; }
+  .btn-danger { background-color: #d9534f; }
+  .btn-danger:hover { background-color: #c82333; }
+  .btn-secondary { background-color: #6c757d; text-decoration: none; }
+  .btn-secondary:hover { background-color: #5a6268; }
+
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: flex-start;
+  }
+  .action-buttons .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .alert {
+    margin: 20px auto;
+    padding: 15px 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 600px;
+    font-weight: 500;
+    text-align: center;
+    animation: fadeOut 3s forwards;
+  }
+
+  .alert.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  @keyframes fadeOut {
+    0% { opacity: 1; transform: translateY(0); }
+    60% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); display: none; }
+  }
+
+  /* Mobile responsiveness */
+  @media screen and (max-width: 768px) {
+    .form-group input, .form-group select, .btn { width: 100%; }
+    .action-buttons { flex-direction: column; }
+
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+    th { display: none; }
+
+    td {
+      text-align: right;
+      padding-left: 50%;
+      position: relative;
+      white-space: normal;
+    }
+
+    td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 15px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    table { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Add Sales</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+          <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+      {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('add_sales') }}" id="addSalesForm">
+      <div class="form-group">
+          <label>Customer :</label>
+          <select name="customer_id" required>
+              <option value="">-- Select Customer --</option>
+              {% for customer in customers %}
+                  <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+              {% endfor %}
+          </select>
+      </div>
+
+      <div class="form-group">
+          <label for="invoice_date">Invoice Date :</label>
+          <input type="date" id="invoice_date" name="invoice_date" required>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price (₹)</th>
+                    <th>Total Price (₹)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <tr>
+                    <td data-label="Product">
+                        <select name="product_id[]" onchange="updateUnitPrice(this)" required>
+                            <option value="">-- Select Product --</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}" data-price="{{ product.selling_price }}">{{ product.product_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td data-label="Quantity"><input type="number" name="quantity[]" min="1" oninput="updateTotalPrice(this)" required></td>
+                    <td data-label="Unit Price (₹)"><input type="number" name="unit_price[]" readonly></td>
+                    <td data-label="Total Price (₹)"><input type="number" name="total_price[]" readonly></td>
+                    <td data-label="Action">
+                        <button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+
+      <button type="button" class="btn btn-primary" style="margin-top:10px;" onclick="addProductRow()">+ Add Product</button>
+
+      <div class="form-group" style="margin-top:15px;">
+          <label for="payment_method">Payment Method :</label>
+          <select name="payment_method" id="payment_method" required>
+              <option value="">-- Select Method --</option>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="UPI">UPI</option>
+              <option value="Net Banking">Net Banking</option>
+              <option value="Other">Other</option>
+          </select>
+      </div>
+
+      <div class="action-buttons">
+          <button type="submit" class="btn btn-primary">Add Sale</button>
+          <a href="{{ url_for('sales_sight') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+  </form>
+</div>
+
+<script>
+function addProductRow() {
+    const table = document.getElementById('productTableBody');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td data-label="Product">
+            <select name="product_id[]" onchange="updateUnitPrice(this)" required>
+                <option value="">-- Select Product --</option>
+                {% for product in products %}
+                <option value="{{ product.id }}" data-price="{{ product.selling_price }}">{{ product.product_name }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td data-label="Quantity"><input type="number" name="quantity[]" min="1" oninput="updateTotalPrice(this)" required></td>
+        <td data-label="Unit Price (₹)"><input type="number" name="unit_price[]" readonly></td>
+        <td data-label="Total Price (₹)"><input type="number" name="total_price[]" readonly></td>
+        <td data-label="Action"><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
+    `;
+    table.appendChild(row);
+}
+
+function updateUnitPrice(selectElement) {
+    const price = selectElement.options[selectElement.selectedIndex].dataset.price || 0;
+    const row = selectElement.closest('tr');
+    row.querySelector('input[name="unit_price[]"]').value = price;
+    updateTotalPrice(row.querySelector('input[name="quantity[]"]'));
+}
+
+function updateTotalPrice(quantityInput) {
+    const row = quantityInput.closest('tr');
+    const unitPrice = parseFloat(row.querySelector('input[name="unit_price[]"]').value) || 0;
+    const quantity = parseInt(quantityInput.value) || 0;
+    row.querySelector('input[name="total_price[]"]').value = (unitPrice * quantity).toFixed(2);
+}
+
+function removeRow(button) {
+    const table = document.getElementById('productTableBody');
+    if (table.rows.length > 1) {
+        button.closest('tr').remove();
+    } else {
+        alert("At least one product row is required!");
+    }
+}
+
+const form = document.querySelector('#addSalesForm');  // Correct way to select by id
+form.reset();    // Reset form fields on page load (optional)
+
+form.addEventListener('submit', function(event) {
+      event.preventDefault();   // Prevent form from submitting
+      // You can add your form submission logic here (e.g., AJAX request)
+
+      form.reset();  // Reset the form after submission
+});
+
+window.onbeforeunload = function () {
+  // Trigger logout by sending an AJAX request to the backend
+  fetch('/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ logout: true })  // Send a logout request
+  });
+};
+</script>
+
+</body>
+</html>

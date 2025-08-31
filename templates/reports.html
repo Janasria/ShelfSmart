@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+
+    <!-- Dashboard-only favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+    
+    <style>
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background-color: rgb(230,230,250);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .report-section {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .metrics {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .metric-card {
+            flex: 1 1 200px;
+            background: #6b5b95;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #6b5b95;
+            color: #fff;
+        }
+        .export-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .export-buttons a {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            background: #6b5b95;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .export-buttons a:hover {
+            background: #5a4a7c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Reports</h1>
+
+        <div class="report-section">
+            <div class="metrics">
+                <div class="metric-card">📅 Total Sales: ₹ {{ total_sales }}</div>
+                <div class="metric-card">💰 Total Revenue: ₹ {{ "%.f"|format(total_revenue or 0) }}</div>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h2>👥 Top Customers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Total Spent (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in top_customers %}
+                    <tr>
+                        <td>{{ customer['customer_name'] }}</td>
+                        <td>₹ {{ customer['total_spent'] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="2" style="text-align:center;">No data available yet</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="report-section">
+            <h2>📦 Best-Selling Products</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Units Sold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in best_products %}
+                    <tr>
+                        <td>{{ product['product_name'] }}</td>
+                        <td>{{ product['total_sold'] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="2" style="text-align:center;">No data available yet</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="export-buttons">
+            <a href="{{ url_for('export_pdf') }}">📄 Export as PDF</a>
+            <a href="{{ url_for('export_csv') }}">📑 Export as CSV</a>
+        </div>
+    </div>
+
+<script>
+window.onbeforeunload = function () {
+    // Trigger logout by sending an AJAX request to the backend
+    fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ logout: true })  // Send a logout request
+    });
+};
+</script>
+</body>
+</html>

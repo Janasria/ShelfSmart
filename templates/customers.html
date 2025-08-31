@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers</title>
+
+    <!-- Dashboard-only favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+    
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background-color: rgb(230, 230, 250); /* Lavender */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #6b5b95;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #6b5b95;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #5a4a82;
+        }
+
+        /* Table Styles */
+        .table-wrapper {
+            overflow-x: auto; /* horizontal scroll for small screens */
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px; /* ensure table looks okay on desktop */
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        .action-btn {
+            background: crimson;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: darkred;
+        }
+
+        /* Flash Alert */
+        .alert {
+            margin: 20px auto;
+            padding: 15px 20px;
+            border-radius: 6px;
+            width: 80%;
+            max-width: 600px;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeOut 3s forwards;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateY(0); }
+            60% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); display: none; }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                margin: 15px auto;
+            }
+
+            input, button {
+                padding: 12px;
+            }
+
+            table th, table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Customer Management</h2>
+
+        <!-- Flash Login Alert -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Add Customer Form -->
+        <form method="POST" action="{{ url_for('customers') }}">
+            <label>Customer Name</label>
+            <input type="text" name="customer_name" placeholder="Enter customer name" required>
+
+            <label>Contact Number</label>
+            <input type="text" name="contact_number" placeholder="Enter contact number">
+
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Enter email address">
+
+            <button type="submit">Add Customer</button>
+        </form>
+
+        <!-- Customer List Table -->
+        <h3>Existing Customers</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Created At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer['customer_name'] }}</td>
+                        <td>{{ customer['contact_number'] }}</td>
+                        <td>{{ customer['email'] }}</td>
+                        <td>{{ customer['created_at'] }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('delete_customer', id=customer['id']) }}" onsubmit="return confirm('Are you sure you want to delete this customer?');">
+                                <button type="submit" class="action-btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const form = document.querySelector('#addSalesForm');  // Correct way to select by id
+    form.reset();    // Reset form fields on page load (optional)
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();   // Prevent form from submitting
+        // You can add your form submission logic here (e.g., AJAX request)
+
+        form.reset();  // Reset the form after submission
+    });
+
+      window.onbeforeunload = function () {
+        // Trigger logout by sending an AJAX request to the backend
+        fetch('/logout', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ logout: true })  // Send a logout request
+        });
+    };
+</script>
+</body>
+</html>

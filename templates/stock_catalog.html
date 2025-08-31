@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Catalog</title>
+
+<!-- Dashboard-only favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+
+<style>
+    /* General Styles */
+    body {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+        color: #6b5b95;
+        margin-bottom: 20px;
+    }
+    .top-actions {
+        text-align: right;
+        margin-bottom: 15px;
+    }
+    .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        margin: 2px;
+        font-size: 14px;
+    }
+    .btn-add { background-color: #6b5b95; }
+    .btn-add:hover { background-color: #5a4a82; }
+    .btn-edit { background-color: #28a745; }
+    .btn-edit:hover { background-color: #218838; }
+    .btn-delete { background-color: #dc3545; }
+    .btn-delete:hover { background-color: #c82333; }
+    
+    /* Flash Messages */
+    .flash {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+    }
+    .flash-success { background-color: #d4edda; color: #155724; }
+    .flash-danger { background-color: #f8d7da; color: #721c24; }
+
+    /* Table Styles */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        min-width: 800px; /* ensures table scroll on small screens */
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        font-size: 14px;
+    }
+    th {
+        background-color: #6b5b95;
+        color: white;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        body { padding: 10px; }
+        .container { padding: 15px; }
+        h2 { font-size: 20px; }
+        .top-actions { text-align: center; }
+        .btn { padding: 5px 10px; font-size: 12px; }
+        table { font-size: 12px; }
+    }
+    @media (max-width: 480px) {
+        th, td { padding: 6px; font-size: 11px; }
+        .btn { padding: 4px 8px; font-size: 10px; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Stock Catalog</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Add Product button -->
+    <div class="top-actions">
+        {% if session['role'] in ['Admin', 'Manager'] %}
+            <a href="{{ url_for('add_product') }}" class="btn btn-add">+ Add Product</a>
+        {% endif %}
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Product Category</th>
+                    <th>SKU</th>
+                    <th>Supplier ID</th>
+                    <th>Unit</th>
+                    <th>Quantity</th>
+                    <th>Purchase Price</th>
+                    <th>Selling Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in stock %}
+                <tr>
+                    <td>{{ product['id'] }}</td>
+                    <td>{{ product['product_name'] }}</td>
+                    <td>{{ product['product_category'] }}</td>
+                    <td>{{ product['sku'] }}</td>
+                    <td>{{ product['supplier_id'] }}</td>
+                    <td>{{ product['measurement_unit'] }}</td>
+                    <td>{{ product['quantity_in_stock'] }}</td>
+                    <td>{{ product['purchase_price'] }}</td>
+                    <td>{{ product['selling_price'] }}</td>
+                    <td>
+                        {% if session['role'] in ['admin', 'manager'] %}
+                            <a href="{{ url_for('edit_product', product_id=product['id']) }}" class="btn btn-edit">Edit</a>
+                            <form method="POST" action="{{ url_for('delete_product', product_id=product['id']) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
+                                <button type="submit" class="btn btn-delete">Delete</button>
+                            </form>
+                        {% else %}
+                            <span style="color: #6b5b95; font-weight: bold;">View Only</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="10" style="text-align:center;">No products found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+window.onbeforeunload = function () {
+    // Trigger logout by sending an AJAX request to the backend
+    fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ logout: true })  // Send a logout request
+    });
+};
+</script>
+</body>
+</html>

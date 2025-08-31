@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ShelfSmart</title>
+
+    <!-- Dashboard-only favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background-color: rgb(230, 230, 250); /* lavender */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px; /* ensures spacing on small screens */
+        }
+        .login-container {
+            background-color: white;
+            padding: 30px 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px; /* adjusts for large screens */
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #6b5b95;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #6b5b95;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #6b5b95;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #5a4a7f;
+        }
+        .flash {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .extra-links {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .extra-links a {
+            color: #6b5b95;
+            text-decoration: none;
+        }
+        .extra-links a:hover {
+            text-decoration: underline;
+        }
+
+        .logo-img {
+            width: 100px;      /* adjust size as needed */
+            height: auto;
+        }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 500px) {
+            .login-container {
+                padding: 25px 15px;
+            }
+            .logo {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            input, select, .btn {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo image -->
+        <img src="{{ url_for('static', filename='icons/ShelfSmart.ico') }}" alt="ShelfSmart Logo" class="logo-img">
+        <h2>Login</h2>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="company">Company Name</label>
+                <input type="text" id="company" name="company" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="staff">Staff</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+        </form>
+
+        <div class="extra-links">
+            <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
+        </div>
+    </div>
+</body>
+</html>

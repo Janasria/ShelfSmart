@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ role|capitalize }} Dashboard</title>
+
+<!-- Dashboard-only favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+
+
+<style>
+  body {
+    margin: 0;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    background: #d2cedc;
+    color: #333;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    height: 100vh;
+    background: linear-gradient(90deg, #7b5fc0, #a285f0);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+
+  .sidebar h3 {
+    color: #f9f8fa;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+  }
+
+  .sidebar ul li {
+    margin: 12px 0;
+  }
+
+  .sidebar ul li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 18px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: 0.3s;
+  }
+
+  .sidebar ul li a:hover {
+    background: #6b5b95;
+    color: #fff;
+  }
+
+  /* Sidebar Logo */
+  .sidebar-logo img {
+    display: block;
+    width: 40%;      /* Adjust as needed */
+    height: auto;
+    margin: 0 auto 20px auto; /* Center and spacing below */
+  }
+
+  .logout {
+    background: #fff;
+    color: #6b5b95;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 30%;
+    transition: 0.3s;
+  }
+
+  .logout:hover {
+    background: #6b5b95;
+    color: #fff;
+  }
+
+  /* Header */
+  header {
+    padding: 20px 30px;
+    background: linear-gradient(90deg, #7b5fc0, #a285f0);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    text-align: center;
+  }
+
+  header h2 {
+    color: #fffeff;
+    font-weight: 600;
+    font-size: 28px;
+    margin: 0;
+  }
+
+  header .header-logo {
+    width: 50px;        /* Adjust size */
+    height: auto;
+    margin-right: 15px; /* Space between logo and header text */
+  }
+
+  /* Hamburger Menu (for mobile) */
+  .hamburger {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #6b5b95;
+    position: absolute;
+    right: 20px;
+  }
+
+  /* Alerts */
+  .alert {
+    margin: 20px auto;
+    padding: 15px 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    font-weight: 500;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .alert.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .alert.hide {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  /* Main Content */
+  .main-content {
+    margin-left: 240px;
+    padding: 30px 40px;
+    transition: margin-left 0.3s ease;
+  }
+
+  .main-content h2 { 
+    color: #333; 
+    margin-bottom: 25px; 
+    font-size: 28px; 
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+  }
+
+  .card {
+    padding: 25px 20px;
+    border-radius: 12px;
+    color: #fff;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+  }
+
+  .card h3 {
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .card p {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .card.products { 
+    background: #54369e;
+  }
+
+  .card.customers { 
+    background: #ff6f61;
+  }
+
+  .card.today { 
+    background: #4caf50;
+  }
+
+  .card.sales { 
+    background: #2196f3;
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) { 
+    .main-content { 
+      padding: 25px 30px;
+    }
+    header h2 { 
+      font-size: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { 
+      transform: translateX(-100%);
+      width: 200px;
+    }
+    .sidebar.active { 
+      transform: translateX(0);
+    }
+    .main-content { 
+      margin-left: 0; 
+      padding: 20px; 
+    }
+    header { 
+      padding: 15px 20px; 
+    }
+    header h2 { 
+      font-size: 22px; 
+    }
+    .hamburger { 
+      display: block; 
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats { 
+      gap: 15px;
+    }
+    .card { 
+      padding: 20px 15px; 
+    }
+    .card h3 { 
+      font-size: 18px; 
+    }
+    .card p { 
+      font-size: 1.4rem; 
+    }
+  }
+  
+</style>
+
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <img src="{{ url_for('static', filename='icons/ShelfSmart.ico') }}" alt="ShelfSmart Logo" class="sidebar-logo-img">
+    </div>
+  <h3>📊 ShelfSmart</h3>
+  <ul>
+    {% if role == "admin" %}
+      <li><a href="{{ url_for('stock_catalog') }}">📦 Stock Catalog</a></li>
+      <li><a href="{{ url_for('add_product') }}">➕ Add Product</a></li>
+      <li><a href="{{ url_for('sales_sight') }}">📊 Sales Sight</a></li>
+      <li><a href="{{ url_for('add_sales') }}">➕ Add Sales</a></li>
+      <li><a href="{{ url_for('customers') }}">👥 Customers</a></li>
+      <li><a href="{{ url_for('reports') }}">📝 Reports</a></li>
+    {% elif role == "manager" %}
+      <li><a href="{{ url_for('stock_catalog') }}">📦 Stock Catalog</a></li>
+      <li><a href="{{ url_for('add_product') }}">➕ Add Product</a></li>
+      <li><a href="{{ url_for('sales_sight') }}">📊 Sales Sight</a></li>
+      <li><a href="{{ url_for('add_sales') }}">➕ Add Sales</a></li>
+      <li><a href="{{ url_for('customers') }}">👥 Customers</a></li>
+      <li><a href="{{ url_for('reports') }}">📝 Reports</a></li>
+    {% elif role == "staff" %}
+      <li><a href="{{ url_for('stock_catalog') }}">📦 Stock Catalog</a></li>
+      <li><a href="{{ url_for('add_sales') }}">➕ Add Sales</a></li>
+      <li><a href="{{ url_for('sales_sight') }}">📊 Sales Sight</a></li>
+      <li><a href="{{ url_for('customers') }}">👥 Customers</a></li>
+      <li><a href="{{ url_for('reports') }}">📝 Reports</a></li>
+    {% endif %}
+  </ul>
+  <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+</div>
+
+<header>
+  <img src="{{ url_for('static', filename='icons/ShelfSmart.ico') }}" alt="ShelfSmart Logo" class="header-logo">
+  <h2>Welcome, {{ role|capitalize }}! Dashboard</h2>
+  <span class="hamburger" id="hamburger">☰</span>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="main-content">
+  <h2>Dashboard Overview</h2>
+  <div class="stats">
+    <div class="card products">
+      <h3>Total Products</h3>
+      <p>{{ total_products }}</p>
+    </div>
+    <div class="card customers">
+      <h3>Total Customers</h3>
+      <p>{{ total_customers }}</p>
+    </div>
+    <div class="card today">
+      <h3>Today's Sales</h3>
+      <p>₹ {{ today_sales }}</p>
+    </div>
+    <div class="card sales">
+      <h3>Total Sales</h3>
+      <p>₹ {{ total_sales }}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-hide alerts
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+      alert.classList.add('hide');
+      setTimeout(() => alert.remove(), 1000);
+    });
+  }, 3000);
+
+  // Sidebar toggle
+  const sidebar = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    hamburger.textContent = sidebar.classList.contains('active') ? '×' : '☰';
+  });
+
+  window.onbeforeunload = function () {
+    // Trigger logout by sending an AJAX request to the backend
+    fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ logout: true })  // Send a logout request
+    });
+  };
+</script>
+
+</body>
+</html>
