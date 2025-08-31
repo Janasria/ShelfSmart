@@ -683,6 +683,7 @@ def export_pdf():
     cursor.execute("SELECT COUNT(*) FROM customers")
     total_customers = cursor.fetchone()[0] or 0
 
+
     # --- Top Customers ---
     cursor.execute('''
         SELECT c.customer_name, SUM(s.total_amount) as total_spent
@@ -728,7 +729,7 @@ def export_pdf():
 
 
     # Logo
-    logo = Image("static/icons/round1.png", width=50, height=50)
+    logo = Image("static/icons/ShelfSmart.png", width=50, height=50)
     logo.hAlign = 'CENTER'
     story.append(logo)
     story.append(Spacer(1, 10))
