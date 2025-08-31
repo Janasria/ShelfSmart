@@ -291,7 +291,7 @@ def dashboard():
 
 # Route for Add Products
 @app.route('/add_product', methods=['GET', 'POST'])
-@login_required("admin")
+@login_required("admin", "manager")
 def add_product():
     if request.method == "POST":
         product_name = request.form["product_name"]
@@ -411,7 +411,7 @@ def delete_product(product_id):
 
 # Route for Add Sales
 @app.route("/add_sales", methods=["GET", "POST"])
-@login_required()
+@login_required("admin", "manager", "staff")
 def add_sales():
     conn = get_db_connection()
     cursor = conn.cursor()

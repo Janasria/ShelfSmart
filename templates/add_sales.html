@@ -214,6 +214,13 @@
                     </td>
                 </tr>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align:right;"><strong>Grand Total (₹):</strong></td>
+                    <td><input type="number" id="grand_total" name="grand_total" value="0" readonly></td>
+                    <td></td>
+                </tr>
+            </tfoot>
         </table>
       </div>
 
@@ -271,6 +278,19 @@ function updateTotalPrice(quantityInput) {
     const unitPrice = parseFloat(row.querySelector('input[name="unit_price[]"]').value) || 0;
     const quantity = parseInt(quantityInput.value) || 0;
     row.querySelector('input[name="total_price[]"]').value = (unitPrice * quantity).toFixed(2);
+
+    updateGrandTotal();
+}
+
+function updateGrandTotal() {
+    let totalInputs = document.querySelectorAll('input[name="total_price[]"]');
+    let grandTotal = 0;
+
+    totalInputs.forEach(input => {
+        grandTotal += parseFloat(input.value) || 0;
+    });
+
+    document.getElementById('grand_total').value = grandTotal.toFixed(2);
 }
 
 function removeRow(button) {
@@ -281,27 +301,6 @@ function removeRow(button) {
         alert("At least one product row is required!");
     }
 }
-
-const form = document.querySelector('#addSalesForm');  // Correct way to select by id
-form.reset();    // Reset form fields on page load (optional)
-
-form.addEventListener('submit', function(event) {
-      event.preventDefault();   // Prevent form from submitting
-      // You can add your form submission logic here (e.g., AJAX request)
-
-      form.reset();  // Reset the form after submission
-});
-
-window.onbeforeunload = function () {
-  // Trigger logout by sending an AJAX request to the backend
-  fetch('/logout', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ logout: true })  // Send a logout request
-  });
-};
 </script>
 
 </body>
