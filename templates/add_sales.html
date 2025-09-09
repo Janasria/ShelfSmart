@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>Add Sales</title>
 
 <!-- Dashboard-only favicon -->
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
 
 <style>
   body {
@@ -301,6 +304,11 @@ function removeRow(button) {
         alert("At least one product row is required!");
     }
 }
+
+// Reset form on page load (browser back button cache fix)
+  window.addEventListener("pageshow", function(event) {
+      if (event.persisted) document.getElementById("addSalesForm").reset();
+  });
 </script>
 
 </body>

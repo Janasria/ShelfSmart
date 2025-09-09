@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Sign Up - ShelfSmart</title>
 
     <!-- Dashboard-only favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
     
     <style>
         /* Reset default margin/padding */
@@ -152,7 +155,7 @@
 <body>
     <div class="signup-container">
         <!-- Logo image -->
-        <img src="{{ url_for('static', filename='icons/ShelfSmart.ico') }}" alt="ShelfSmart Logo" class="logo-img">
+        <img src="{{ url_for('static', filename='icons/shelfsmart_crop.png') }}" alt="ShelfSmart Logo" class="logo-img">
         <h2>Create Account</h2>
 
         <!-- Flash messages -->
@@ -164,7 +167,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('signup') }}">
+        <form method="POST" action="{{ url_for('signup') }}" id="signupForm" autocomplete="off">
             <div class="form-group">
                 <label for="company">Company Name</label>
                 <input type="text" id="company" name="company" required>
@@ -197,5 +200,11 @@
             <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
         </div>
     </div>
+<script>
+    // Reset form on page load (browser back button cache fix)
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted) document.getElementById("signupForm").reset();
+        });
+</script>
 </body>
 </html>

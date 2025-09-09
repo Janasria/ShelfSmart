@@ -2,157 +2,365 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ShelfSmart Report</title>
+<style>
+    body {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        margin: 0;
+        padding: 25px;
+        color: #333;
+        background-color: #fff;
+    }
 
-    <!-- Dashboard-only favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
-    
-    <style>
-        body {
-            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-            background-color: rgb(230,230,250);
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 700px;
-            margin: 30px auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .report-section {
-            background: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .metrics {
-            display: flex;
+    /* Header */
+        header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 4px solid #6A0DAD;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+    }
+
+    header img {
+        height: 60px;
+        margin: 0 3%;
+        object-fit: contain;
+    }
+
+    header h1 {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+        color: #6A0DAD;
+        margin: 0;
+    }
+
+    header .date-info {
+        font-size: 14px;
+        color: #555;
+        text-align: right;
+        line-height: 1.4;
+        min-width: 200px;
+    }
+
+        /* Summary Grid */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
+            margin-bottom: 40px;
         }
-        .metric-card {
-            flex: 1 1 200px;
-            background: #6b5b95;
-            color: #fff;
-            padding: 15px;
-            border-radius: 8px;
+
+        .summary div {
+            background: #e1d8ee;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
-            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+
+        .summary div:hover {
+            transform: translateY(-4px);
         }
-        table, th, td {
-            border: 1px solid #ccc;
+
+        .summary div h2 {
+            margin: 8px 0;
+            font-size: 22px;
+            color: #6A0DAD;
         }
-        th, td {
-            padding: 10px;
-            text-align: left;
+
+        .summary div p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
         }
-        th {
-            background: #6b5b95;
-            color: #fff;
+
+    /* Section titles */
+    h2.section-title {
+        color: #6A0DAD;
+        margin-top: 45px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #D1C4E9;
+        padding-bottom: 5px;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 35px;
+        font-size: 13px;
+        overflow-wrap: break-word;
+    }
+
+    th, td {
+        border: 1px solid #070505;
+        padding: 10px 12px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #6A0DAD;
+        color: #fff;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f7f7f7;
+    }
+
+    tr.low-stock {
+        background-color: #f6d4d7 !important;
+        font-weight: bold;
+    }
+
+    /* Optional sticky headers for long tables */
+    thead th {
+        position: sticky;
+        top: 0;
+        background-color: #6A0DAD;
+        color: #fff;
+        z-index: 1;
+    }
+
+/* Export Buttons Container */
+.export-container {
+    margin: 20px 0;
+    text-align: center; /* Center the buttons */
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Space between buttons */
+}
+
+
+
+.export-btn {
+    background: linear-gradient(135deg, #c8a2f3, #e9d8fd); /* lavender gradient */
+    color: #4b0082; /* deep purple text */
+    border: none;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    padding: 10px 18px;
+    margin-left: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.export-btn:hover {
+    background: linear-gradient(135deg, #b57edc, #dcd0ff); /* darker lavender hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+        .summary {
+            flex-direction: column;
         }
-        .export-buttons {
-            margin-top: 20px;
-            text-align: center;
+
+        .summary div {
+            margin-bottom: 15px;
         }
-        .export-buttons a {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 15px;
-            background: #6b5b95;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
+
+        header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
         }
-        .export-buttons a:hover {
-            background: #5a4a7c;
+
+        header h1 {
+            position: static;
+            transform: none;
+            margin: 10px 0;
         }
-    </style>
+
+        header .date-info {
+            text-align: justify;
+        }
+    }
+</style>
+
 </head>
 <body>
-    <div class="container">
-        <h1>📊 Reports</h1>
 
-        <div class="report-section">
-            <div class="metrics">
-                <div class="metric-card">📅 Total Sales: ₹ {{ total_sales }}</div>
-                <div class="metric-card">💰 Total Revenue: ₹ {{ "%.f"|format(total_revenue or 0) }}</div>
-            </div>
-        </div>
-
-        <div class="report-section">
-            <h2>👥 Top Customers</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Total Spent (₹)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for customer in top_customers %}
-                    <tr>
-                        <td>{{ customer['customer_name'] }}</td>
-                        <td>₹ {{ customer['total_spent'] }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="2" style="text-align:center;">No data available yet</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="report-section">
-            <h2>📦 Best-Selling Products</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Units Sold</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in best_products %}
-                    <tr>
-                        <td>{{ product['product_name'] }}</td>
-                        <td>{{ product['total_sold'] }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="2" style="text-align:center;">No data available yet</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="export-buttons">
-            <a href="{{ url_for('export_pdf') }}">📄 Export as PDF</a>
-            <a href="{{ url_for('export_csv') }}">📑 Export as CSV</a>
-        </div>
+<header>
+    <img src="/static/icons/ShelfSmart.png" alt="ShelfSmart Logo">
+    <h1>ShelfSmart Report</h1>
+    <div class="date-info">
+        <div id="clock"></div>
+        Prepared by : {{ user_name }} ({{ user_role }})
     </div>
+</header>
+
+<!-- Summary Cards -->
+<div class="summary">
+    <div>
+        <p>Total Products</p>
+        <h2>{{ total_products }}</h2>
+    </div>
+    <div>
+        <p>Total Sales</p>
+        <h2>₹ {{ total_sales }}</h2>
+    </div>
+    <div>
+        <p>Total Revenue</p>
+        <h2>₹ {{ total_revenue }}</h2>
+    </div>
+    <div>
+        <p>Total Customers</p>
+        <h2>{{ total_customers }}</h2>
+    </div>
+    <div>
+        <p>Low Stock Items</p>
+        <h2>{{ low_stock_items }}</h2>
+    </div>
+    <div>
+        <p>Today's Revenue</p>
+        <h2>₹ {{ today_revenue }}</h2>
+    </div>
+    <div>
+        <p>Today's Sales</p>
+        <h2>₹ {{ today_sales }}</h2>
+    </div>
+</div>
+
+<!-- Export Button -->
+<div class="export-container">
+    <form action="{{ url_for('export_pdf') }}" method="get" style="display:inline;">
+        <button type="submit" class="export-btn">📄 Export as PDF</button>
+    </form>
+    <form action="{{ url_for('export_csv') }}" method="get" style="display:inline;">
+        <button type="submit" class="export-btn">📑 Export as CSV</button>
+    </form>
+</div>
+
+<!-- Stock Table -->
+<h2 class="section-title">Recent Stocks</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Supplier</th>
+            <th>Unit</th>
+            <th>Stock Qty</th>
+            <th>Reorder Level</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if recent_stock %}
+            {% for item in recent_stock %}
+                <tr class="{{ 'low-stock' if item.quantity_in_stock <= item.reorder_level else '' }}">
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.category_name }}</td>
+                    <td>{{ item.supplier_id }}</td>
+                    <td>{{ item.unit_name }}</td>
+                    <td>{{ item.quantity_in_stock }}</td>
+                    <td>{{ item.reorder_level }}</td>
+                    <td>₹ {{ item.purchase_price }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="8" style="text-align:center;">No recent stocks found.</td></tr>
+        {% endif %}
+
+    </tbody>
+</table>
+
+<!-- Sales Table -->
+<h2 class="section-title">Recent Sales</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Invoice No</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Products</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if recent_sales %}
+            {% for sale in recent_sales %}
+                <tr>
+                    <td>{{ sale.invoice_number }}</td>
+                    <td>{{ sale.customer_name }}</td>
+                    <td>{{ sale.sale_date }}</td>
+                    <td>{{ sale.products }}</td>
+                    <td>{{ sale.quantity }}</td>
+                    <td>₹ {{ sale.total_amount }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="6" style="text-align:center;">No recent sales found.</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<!-- Customers Table -->
+<h2 class="section-title">Recent Customers</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Total Purchases</th>
+            <th>Last Purchase</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if recent_customers %}
+            {% for customer in recent_customers %}
+                <tr>
+                    <td>{{ customer.customer_name }}</td>
+                    <td>{{ customer.contact_number }}</td>
+                    <td>{{ customer.email }}</td>
+                    <td>₹ {{ customer.total_purchases }}</td>
+                    <td>{{ customer.last_purchase }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="5" style="text-align:center;">No recent customers found.</td></tr>
+        {% endif %}
+    </tbody>
+</table>
+
 
 <script>
-window.onbeforeunload = function () {
-    // Trigger logout by sending an AJAX request to the backend
-    fetch('/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ logout: true })  // Send a logout request
-    });
-};
+    function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0 should be 12
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        const timeString = "Date : " + hours + " : " + minutes + " : " + seconds + " " + ampm;
+        document.getElementById('clock').innerText = timeString;
+    }
+    setInterval(updateClock, 1000); // update every second
+    updateClock(); // run once immediately
 </script>
+
 </body>
 </html>

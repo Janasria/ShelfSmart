@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Add Stocks</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
   <!-- Dashboard-only favicon -->
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
   
   <style>
     /* Base Styles */
@@ -217,7 +220,7 @@
     {% endwith %}
 
     <!-- Add Stock Form -->
-    <form method="POST" action="{{ url_for('add_product') }}" id="addProductForm">
+    <form method="POST" action="{{ url_for('add_product') }}" id="addProductForm" autocomplete="off">
       <div class="form-grid">
 
         <!-- Left Column -->
@@ -226,15 +229,21 @@
           <input type="text" id="product_name" name="product_name" required>
           
           <label for="product_category">Product Category :</label>
-          <select name="product_category" id="product_category" required>
-            <option value="" disabled selected>-- Select Product Category --</option>
-            <option value="Groceries">Groceries</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Clothing">Fashion</option>
-            <option value="Home & Kitchen">Home & Kitchen</option>
-            <option value="Books">Accessories</option>
-            <option value="Health & Beauty">Personal Care</option>
-            <option value="Other">Other</option>
+          <select name="category_id" id="category_id" required>
+            <option value="" disabled selected>-- Select Category --</option>
+            {% for category in categories %}
+                <option value="{{ category['id'] }}">{{ category['category_name'] }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="product_subcategory">Sub Category :</label>
+          <select name="subcategory_id" id="subcategory_id">
+            <option value="" disabled selected>-- Select Subcategory --</option>
+          </select>
+
+          <label for="category_group_id">Category Group:</label>
+          <select id="category_group_id" name="category_group_id" required>
+            <option value="" disabled selected>-- Select Group --</option>
           </select>
       
           <label for="sku">SKU (Stock Keeping Unit) :</label>
@@ -243,12 +252,18 @@
           <label for="supplier_id">Supplier ID :</label>
           <input type="text" id="supplier_id" name="supplier_id" required>
 
-          <label for="measurement_unit">Measurement Unit :</label>
-          <input type="text" id="measurement_unit" name="measurement_unit" required>
         </div>
 
         <!-- Right Column -->
         <div class="form-group">
+          <label for="measurement_unit">Measurement Unit :</label>
+          <select name="unit_id" id="unit_id" required>
+            <option value="" disabled selected>-- Select Unit --</option>
+            {% for unit in units %}
+                <option value="{{ unit['id'] }}">{{ unit['unit_name'] }} ({{ unit['abbreviation'] }})</option>
+            {% endfor %}
+          </select>
+
           <label for="quantity_in_stock">Quantity in Stock :</label>
           <input type="number" id="quantity_in_stock" name="quantity_in_stock" required>
 
@@ -268,31 +283,67 @@
         <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancel</a>
         <button type="submit" class="btn btn-primary">Add New Stock</button>
       </div>
+
     </form>
   </div>
 
 <script>
-  const form = document.querySelector('#addProductForm');  // Correct way to select by id
-  form.reset();    // Reset form fields on page load (optional)
-  
-  form.addEventListener('submit', function(event) {
-        event.preventDefault();   // Prevent form from submitting
-        // You can add your form submission logic here (e.g., AJAX request)
-
-        form.reset();  // Reset the form after submission
+  // Reset form on page load (browser back button cache fix)
+  window.addEventListener("pageshow", function(event) {
+    if (event.persisted) document.getElementById("addProductForm").reset();
   });
 
-  window.onbeforeunload = function () {
-    // Trigger logout by sending an AJAX request to the backend
-    fetch('/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ logout: true })  // Send a logout request
-    });
-  };
+
+  // window.onbeforeunload = function () {
+  //   // Trigger logout by sending an AJAX request to the backend
+  //   fetch('/logout', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ logout: true })  // Send a logout request
+  //   });
+  // };
+  document.getElementById("category_id").addEventListener("change", function() {
+      let categoryId = this.value;
+      let subSelect = document.getElementById("subcategory_id");
+      let groupSelect = document.getElementById("category_group_id");
+
+      subSelect.innerHTML = '<option value="">Loading...</option>';
+      groupSelect.innerHTML = '<option value="">-- Select Group --</option>'; // Reset groups
+
+      fetch(`/get_subcategories/${categoryId}`)
+          .then(res => res.json())
+          .then(data => {
+              subSelect.innerHTML = '<option value="">Select Subcategory</option>';
+              data.forEach(sub => {
+                  let option = document.createElement("option");
+                  option.value = sub.id;
+                  option.text = sub.name;
+                  subSelect.appendChild(option);
+              });
+          });
+  });
+
+  document.getElementById("subcategory_id").addEventListener("change", function() {
+      let subcategoryId = this.value;
+      let groupSelect = document.getElementById("category_group_id");
+      groupSelect.innerHTML = '<option value="">Loading...</option>';
+
+      fetch(`/get_category_groups/${subcategoryId}`)
+          .then(res => res.json())
+          .then(data => {
+              groupSelect.innerHTML = '<option value="">Select Group</option>';
+              data.forEach(group => {
+                  let option = document.createElement("option");
+                  option.value = group.id;
+                  option.text = group.name;
+                  groupSelect.appendChild(option);
+              });
+          });
+  });
 </script>
+
 
 </body>
 </html>

@@ -6,13 +6,11 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Edit Product</title>
+    <title>Restock Product</title>
 
-    <!-- Dashboard-only favicon -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
     
     <style>
-        /* General Styles */
         body { 
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
             background-color: #f5f5f5; 
@@ -21,8 +19,8 @@
         }
 
         .container { 
-            max-width: 600px; 
-            margin: 40px auto; 
+            max-width: 500px; 
+            margin: 50px auto; 
             background: white; 
             padding: 30px; 
             border-radius: 10px; 
@@ -69,7 +67,7 @@
             color: white; 
             text-decoration: none; 
             font-size: 16px;
-            flex: 1 1 45%; /* responsive buttons */
+            flex: 1 1 45%;
             text-align: center;
         }
 
@@ -89,13 +87,14 @@
             background-color: #5a6268; 
         }
 
-        /* Flash messages */
         .flash { 
             padding: 12px; 
             margin-bottom: 20px; 
             border-radius: 6px; 
             font-size: 14px;
             word-wrap: break-word;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
         }
 
         .flash-success { 
@@ -108,7 +107,6 @@
             color: #721c24; 
         }
 
-        /* Responsive Styles */
         @media (max-width: 480px) {
             .container {
                 padding: 20px;
@@ -122,7 +120,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Edit Product</h2>
+        <h2>Restock Product</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -132,38 +130,40 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="" id="editProductForm" autocomplete="off">
+        <form method="POST" action="{{ url_for('restock') }}" id="restockForm" autocomplete="off">
             <div class="form-group">
-                <label>Product Name</label>
-                <input type="text" name="product_name" value="{{ product['product_name'] }}" required>
+                <label>Product SKU</label>
+                <input type="text" name="sku" placeholder="Enter SKU" required>
             </div>
 
             <div class="form-group">
-                <label>Product Category</label>
-                <input type="text" name="product_category" value="{{ product['product_category'] }}" required>
-            </div>
-
-            <div class="form-group">
-                <label>Selling Price</label>
-                <input type="number" name="selling_price" min="0" step="0.01" value="{{ product['selling_price'] }}" required>
-            </div>
-
-            <div class="form-group">
-                <label>Quantity in Stock</label>
-                <input type="number" name="quantity_in_stock" min="0" value="{{ product['quantity_in_stock'] }}" required>
+                <label>Quantity to Add</label>
+                <input type="number" name="quantity" min="1" placeholder="Enter quantity" required>
             </div>
 
             <div class="action-buttons">
-                <button type="submit" class="btn btn-primary">Update Product</button>
+                <button type="submit" class="btn btn-primary">Restock</button>
                 <a href="{{ url_for('stock_catalog') }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
-<script>
-    // Reset form on page load (browser back button cache fix)
-        window.addEventListener("pageshow", function(event) {
-            if (event.persisted) document.getElementById("editProductForm").reset();
+
+    <script>
+        // Auto-hide flash messages after 3 seconds
+        window.addEventListener("DOMContentLoaded", () => {
+            const flashes = document.querySelectorAll(".flash");
+            flashes.forEach(flash => {
+                setTimeout(() => {
+                    flash.style.opacity = "0";
+                    setTimeout(() => flash.remove(), 500);
+                }, 3000);
+            });
         });
-</script>
+
+        // Reset form on page load (browser back button cache fix)
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted) document.getElementById("restockForm").reset();
+        });
+    </script>
 </body>
 </html>

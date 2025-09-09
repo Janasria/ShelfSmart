@@ -6,7 +6,7 @@
 <title>Stock Catalog</title>
 
 <!-- Dashboard-only favicon -->
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
 
 <style>
     /* General Styles */
@@ -17,7 +17,7 @@
         padding: 0;
     }
     .container {
-        max-width: 1200px;
+        max-width: 1300px;
         margin: 20px auto;
         background-color: #fff;
         padding: 20px;
@@ -62,7 +62,6 @@
     /* Table Styles */
     .table-responsive {
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
     }
     table {
         width: 100%;
@@ -109,13 +108,6 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Add Product button -->
-    <div class="top-actions">
-        {% if session['role'] in ['Admin', 'Manager'] %}
-            <a href="{{ url_for('add_product') }}" class="btn btn-add">+ Add Product</a>
-        {% endif %}
-    </div>
-
     <div class="table-responsive">
         <table>
             <thead>
@@ -123,10 +115,13 @@
                     <th>ID</th>
                     <th>Product Name</th>
                     <th>Product Category</th>
+                    <th>Sub Category</th>
+                    <th>Category Group</th>
                     <th>SKU</th>
                     <th>Supplier ID</th>
                     <th>Unit</th>
                     <th>Quantity</th>
+                    <th>Reorder Level</th>
                     <th>Purchase Price</th>
                     <th>Selling Price</th>
                     <th>Actions</th>
@@ -137,11 +132,14 @@
                 <tr>
                     <td>{{ product['id'] }}</td>
                     <td>{{ product['product_name'] }}</td>
-                    <td>{{ product['product_category'] }}</td>
+                    <td>{{ product['category_id'] }}</td>
+                    <td>{{ product['subcategory_id'] }}</td>
+                    <td>{{ product['category_group_id'] }}</td>
                     <td>{{ product['sku'] }}</td>
                     <td>{{ product['supplier_id'] }}</td>
-                    <td>{{ product['measurement_unit'] }}</td>
+                    <td>{{ product['unit_id'] }}</td>
                     <td>{{ product['quantity_in_stock'] }}</td>
+                    <td>{{ product['reorder_level'] }}</td>
                     <td>{{ product['purchase_price'] }}</td>
                     <td>{{ product['selling_price'] }}</td>
                     <td>
@@ -157,7 +155,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="10" style="text-align:center;">No products found.</td>
+                    <td colspan="12" style="text-align:center;">No products found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -165,16 +163,16 @@
     </div>
 </div>
 <script>
-window.onbeforeunload = function () {
-    // Trigger logout by sending an AJAX request to the backend
-    fetch('/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ logout: true })  // Send a logout request
-    });
-};
+// window.onbeforeunload = function () {
+//     // Trigger logout by sending an AJAX request to the backend
+//     fetch('/logout', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ logout: true })  // Send a logout request
+//     });
+// };
 </script>
 </body>
 </html>

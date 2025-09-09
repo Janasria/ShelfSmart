@@ -4,10 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ role|capitalize }} Dashboard</title>
-
-<!-- Dashboard-only favicon -->
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
-
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
 
 <style>
   body {
@@ -35,10 +32,17 @@
 
   .sidebar h3 {
     color: #f9f8fa;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     text-align: center;
     font-size: 28px;
     font-weight: 600;
+  }
+
+  .sidebar-logo img {
+    display: block;
+    width: 60%;
+    height: auto;
+    margin: 15px auto 5px auto;
   }
 
   .sidebar ul {
@@ -69,14 +73,6 @@
     color: #fff;
   }
 
-  /* Sidebar Logo */
-  .sidebar-logo img {
-    display: block;
-    width: 40%;      /* Adjust as needed */
-    height: auto;
-    margin: 0 auto 20px auto; /* Center and spacing below */
-  }
-
   .logout {
     background: #fff;
     color: #6b5b95;
@@ -86,7 +82,7 @@
     font-weight: 600;
     font-size: 18px;
     text-align: center;
-    margin-bottom: 30%;
+    margin-bottom: 60px;
     transition: 0.3s;
   }
 
@@ -113,21 +109,21 @@
     color: #fffeff;
     font-weight: 600;
     font-size: 28px;
-    margin: 0;
+    margin: 10px;
+    margin-left: 200px;
   }
 
   header .header-logo {
-    width: 50px;        /* Adjust size */
+    width: 50px;
     height: auto;
-    margin-right: 15px; /* Space between logo and header text */
+    margin-right: 15px;
   }
 
-  /* Hamburger Menu (for mobile) */
   .hamburger {
     display: none;
     font-size: 28px;
     cursor: pointer;
-    color: #6b5b95;
+    color: #fff; /* Fixed color to be visible on the header background */
     position: absolute;
     right: 20px;
   }
@@ -145,16 +141,10 @@
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
 
-  .alert.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-  }
-
-  .alert.hide {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
+  .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .alert.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+  .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .alert.hide { opacity: 0; transform: translateY(-20px); }
 
   /* Main Content */
   .main-content {
@@ -163,16 +153,13 @@
     transition: margin-left 0.3s ease;
   }
 
-  .main-content h2 { 
-    color: #333; 
-    margin-bottom: 25px; 
-    font-size: 28px; 
-  }
+  .main-content h2 { color: #333; margin-bottom: 25px; font-size: 28px; }
 
   .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 40px;
+    margin-bottom: 40px;
   }
 
   .card {
@@ -184,113 +171,92 @@
     transition: transform 0.2s, box-shadow 0.2s;
   }
 
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+  .card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.15); }
+
+  .card h3 { margin-bottom: 12px; font-size: 20px; font-weight: 500; }
+  .card p { font-size: 1.6rem; font-weight: bold; margin: 0; }
+
+  .card.products { background: #54369e; }
+  .card.sales { background: #2196f3; }
+  .card.today { background: #ff6f61; }
+  .card.todayvalue { background: #4caf50; }
+  .card.lowstock { background: #ff9800; }
+
+  /* Quick Actions */
+  .quick-actions {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
   }
 
-  .card h3 {
-    margin-bottom: 12px;
-    font-size: 20px;
-    font-weight: 500;
+  .quick-actions a {
+    flex: 1 1 150px;
+    background: #7b5fc0;
+    color: #fff;
+    text-align: center;
+    padding: 15px 10px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
   }
 
-  .card p {
-    font-size: 1.6rem;
+  .quick-actions a:hover { background: #54369e; }
+
+  .card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .card-title {
+    font-size: 18px;
     font-weight: bold;
-    margin: 0;
-  }
-
-  .card.products { 
-    background: #54369e;
-  }
-
-  .card.customers { 
-    background: #ff6f61;
-  }
-
-  .card.today { 
-    background: #4caf50;
-  }
-
-  .card.sales { 
-    background: #2196f3;
+    margin-bottom: 15px;
+    color: #5a3ea1; /* purple accent */
   }
 
   /* Responsive */
   @media (max-width: 992px) { 
-    .main-content { 
-      padding: 25px 30px;
-    }
-    header h2 { 
-      font-size: 24px;
-    }
+    .main-content { padding: 25px 30px; } 
+    header h2 { font-size: 24px; } 
   }
-
   @media (max-width: 768px) {
-    .sidebar { 
-      transform: translateX(-100%);
-      width: 200px;
-    }
-    .sidebar.active { 
-      transform: translateX(0);
-    }
-    .main-content { 
-      margin-left: 0; 
-      padding: 20px; 
-    }
-    header { 
-      padding: 15px 20px; 
-    }
-    header h2 { 
-      font-size: 22px; 
-    }
-    .hamburger { 
-      display: block; 
-    }
+    .sidebar { transform: translateX(-100%); width: 200px; }
+    .sidebar.active { transform: translateX(0); }
+    .main-content { margin-left: 0; padding: 20px; }
+    header { padding: 15px 20px; }
+    header h2 { font-size: 22px; }
+    .hamburger { display: block; }
+    .charts { flex-direction: column; }
   }
-
-  @media (max-width: 480px) {
-    .stats { 
-      gap: 15px;
-    }
-    .card { 
-      padding: 20px 15px; 
-    }
-    .card h3 { 
-      font-size: 18px; 
-    }
-    .card p { 
-      font-size: 1.4rem; 
-    }
+  @media (max-width: 480px) { 
+    .stats { gap: 15px; } 
+    .card { padding: 20px 15px; } 
+    .card h3 { font-size: 18px; } 
+    .card p { font-size: 1.4rem; } 
   }
-  
 </style>
-
 </head>
-<body>
 
+<body>
 <div class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-        <img src="{{ url_for('static', filename='icons/ShelfSmart.ico') }}" alt="ShelfSmart Logo" class="sidebar-logo-img">
-    </div>
+  <div class="sidebar-logo">
+    <img src="{{ url_for('static', filename='icons/shelfsmart_crop.png') }}" alt="ShelfSmart Logo">
+  </div>
   <h3>📊 ShelfSmart</h3>
   <ul>
-    {% if role == "admin" %}
+    {% if role in ["admin","manager"] %}
       <li><a href="{{ url_for('stock_catalog') }}">📦 Stock Catalog</a></li>
       <li><a href="{{ url_for('add_product') }}">➕ Add Product</a></li>
       <li><a href="{{ url_for('sales_sight') }}">📊 Sales Sight</a></li>
       <li><a href="{{ url_for('add_sales') }}">➕ Add Sales</a></li>
       <li><a href="{{ url_for('customers') }}">👥 Customers</a></li>
       <li><a href="{{ url_for('reports') }}">📝 Reports</a></li>
-    {% elif role == "manager" %}
-      <li><a href="{{ url_for('stock_catalog') }}">📦 Stock Catalog</a></li>
-      <li><a href="{{ url_for('add_product') }}">➕ Add Product</a></li>
-      <li><a href="{{ url_for('sales_sight') }}">📊 Sales Sight</a></li>
-      <li><a href="{{ url_for('add_sales') }}">➕ Add Sales</a></li>
-      <li><a href="{{ url_for('customers') }}">👥 Customers</a></li>
-      <li><a href="{{ url_for('reports') }}">📝 Reports</a></li>
-    {% elif role == "staff" %}
+    {% else %}
       <li><a href="{{ url_for('stock_catalog') }}">📦 Stock Catalog</a></li>
       <li><a href="{{ url_for('add_sales') }}">➕ Add Sales</a></li>
       <li><a href="{{ url_for('sales_sight') }}">📊 Sales Sight</a></li>
@@ -302,8 +268,10 @@
 </div>
 
 <header>
-  <img src="{{ url_for('static', filename='icons/ShelfSmart.ico') }}" alt="ShelfSmart Logo" class="header-logo">
-  <h2>Welcome, {{ role|capitalize }}! Dashboard</h2>
+  <!-- <img src="{{ url_for('static', filename='icons/Shelfsmart.png') }}" alt="ShelfSmart Logo" class="header-logo">
+   -->
+  <!-- Greeting -->
+  <h2>{{ greeting }} , {{ username }} {{ role|capitalize }} !</h2>
   <span class="hamburger" id="hamburger">☰</span>
 </header>
 
@@ -317,25 +285,29 @@
 
 <div class="main-content">
   <h2>Dashboard Overview</h2>
+
   <div class="stats">
     <div class="card products">
       <h3>Total Products</h3>
-      <p>{{ total_products }}</p>
-    </div>
-    <div class="card customers">
-      <h3>Total Customers</h3>
-      <p>{{ total_customers }}</p>
-    </div>
-    <div class="card today">
-      <h3>Today's Sales</h3>
-      <p>₹ {{ today_sales }}</p>
+      <p>{{ total_products}}</p>
     </div>
     <div class="card sales">
       <h3>Total Sales</h3>
-      <p>₹ {{ total_sales }}</p>
+      <p>{{ total_sales }}</p>
+    </div>
+    <div class="card today">
+      <h3>Today's Sales</h3>
+      <p>{{ today_sales }}</p>
+    </div>
+    <div class="card todayvalue">
+      <h3>Today's Sales Value</h3>
+      <p>₹ {{ today_value }}</p>
+    </div>
+    <div class="card lowstock">
+      <h3>Low Stock Items</h3>
+      <p>{{ low_stock_count }}</p>
     </div>
   </div>
-</div>
 
 <script>
   // Auto-hide alerts
@@ -349,22 +321,10 @@
   // Sidebar toggle
   const sidebar = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-    hamburger.textContent = sidebar.classList.contains('active') ? '×' : '☰';
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      hamburger.textContent = sidebar.classList.contains('active') ? '×' : '☰';
   });
-
-  window.onbeforeunload = function () {
-    // Trigger logout by sending an AJAX request to the backend
-    fetch('/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ logout: true })  // Send a logout request
-    });
-  };
 </script>
-
 </body>
 </html>

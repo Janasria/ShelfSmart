@@ -6,7 +6,7 @@
     <title>Sales Sight</title>
 
     <!-- Dashboard-only favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.ico') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/ShelfSmart.png') }}">
     
     <style>
         /* Base Styles */
@@ -125,9 +125,7 @@
             {% endfor %}
             {% endif %}
         {% endwith %}
-
-        <a href="{{ url_for('add_sales') }}" class="btn">+ Add Sales</a>
-
+        
         <table>
             <thead>
                 <tr>
@@ -160,16 +158,16 @@
         </table>
     </div>
 <script>
-window.onbeforeunload = function () {
-    // Trigger logout by sending an AJAX request to the backend
-    fetch('/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ logout: true })  // Send a logout request
-    });
-};
+// window.onbeforeunload = function () {
+//     // Trigger logout by sending an AJAX request to the backend
+//     fetch('/logout', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ logout: true })  // Send a logout request
+//     });
+// };
 </script>
 </body>
 </html>

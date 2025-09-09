@@ -5,8 +5,8 @@ const urlsToCache = [
   "/",
   "/static/css/styles.css",   // fixed name
   "/static/js/main.js",
-  "/static/icons/shelf-logo-white.png", // match manifest
-  "/static/icons/shelf-logo-white.png"
+  "/static/icons/ShelfSmart.png", // match manifest
+  "/static/icons/ShelfSmart.png"
 ];
 
 // Install event: cache files
